@@ -10,9 +10,11 @@
     --card:#ffffff;
     --border:#e8e4de;
     --accent:#d97706;
+    --accent-dark:#b45309;
     --text-muted:#8a8480;
     --text-dark:#374151;
     --green:#059669;
+    --ink:#1c1917;
   }
   *{box-sizing:border-box;}
   body{
@@ -22,30 +24,95 @@
     margin:0;
     -webkit-font-smoothing:antialiased;
   }
+  .wrap{ max-width:1000px; margin:0 auto; }
   .card{
     background:var(--card);
     border-radius:12px;
     padding:24px;
-    max-width:800px;
-    margin:0 auto;
     border:1px solid var(--border);
   }
   .header{
     border-bottom:3px solid var(--accent);
     padding-bottom:12px;
-    margin-bottom:20px;
+    margin-bottom:16px;
   }
-  .title{
-    font-size:28px;
-    font-weight:700;
-    margin:0;
-    color:#1c1917;
+  .title{ font-size:28px; font-weight:700; margin:0; color:var(--ink); }
+  .subtitle{ font-size:12px; color:var(--text-muted); margin-top:4px; }
+  .header-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+  .header-row .btn{ white-space:nowrap; }
+
+  /* ── Toolbar ─────────────────────────────────────── */
+  .toolbar{ margin-bottom:18px; }
+  .row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px; }
+  .row:last-child{ margin-bottom:0; }
+  input[type=text], input[type=number], select{
+    font-family:inherit;
+    font-size:13px;
+    padding:7px 10px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:#fff;
+    color:var(--text-dark);
   }
-  .subtitle{
-    font-size:12px;
+  input[type=text]:focus, input[type=number]:focus, select:focus{
+    outline:none; border-color:var(--accent);
+  }
+  .lot-input{ width:110px; }
+  .num-input{ width:80px; }
+  label.mini{ font-size:11px; color:var(--text-muted); margin-right:2px; white-space:nowrap; }
+  .filter-group{ display:flex; align-items:center; gap:4px; }
+
+  button{ font-family:inherit; cursor:pointer; }
+  .btn{
+    padding:7px 16px;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    font-size:13px;
+    font-weight:600;
+  }
+  .btn:hover{ background:var(--accent-dark); }
+  .btn.secondary{
+    background:#fff;
+    color:var(--ink);
+    border:1px solid var(--border);
+    font-weight:500;
+  }
+  .btn.secondary:hover{ background:#f3f2ef; }
+  .btn.ghost{
+    background:transparent;
     color:var(--text-muted);
-    margin-top:4px;
+    border:1px solid var(--border);
+    font-weight:500;
+    font-size:12px;
+    padding:6px 12px;
   }
+  .btn.ghost:hover{ color:var(--ink); border-color:var(--text-muted); }
+
+  .view-tabs{ display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .view-tabs button{
+    padding:7px 14px;
+    font-size:13px;
+    background:#fff;
+    border:none;
+    border-right:1px solid var(--border);
+    color:var(--text-muted);
+    font-weight:600;
+  }
+  .view-tabs button:last-child{ border-right:none; }
+  .view-tabs button.active{ background:var(--accent); color:#fff; }
+  .view-tabs button:not(.active):hover{ background:#f3f2ef; }
+
+  .sort-dir{
+    width:32px; text-align:center; padding:7px 0;
+    background:#fff; border:1px solid var(--border); border-radius:6px; color:var(--text-dark);
+  }
+  .sort-dir:hover{ border-color:var(--accent); }
+
+  .results-count{ font-size:12px; color:var(--text-muted); margin-bottom:10px; }
+
+  /* ── List view ───────────────────────────────────── */
   .item{
     border-left:5px solid #ccc;
     padding:16px;
@@ -54,83 +121,146 @@
     border-radius:0 8px 8px 0;
     box-shadow:0 1px 2px rgba(0,0,0,0.03);
   }
-  .brand{
-    font-weight:700;
-    font-size:18px;
-    margin-bottom:4px;
-    display:inline-block;
-    padding:2px 8px;
-    border-radius:4px;
+  .brand-badge{
+    font-weight:700; font-size:18px; margin-bottom:4px;
+    display:inline-block; padding:2px 8px; border-radius:4px;
   }
-  .meta{
-    color:var(--text-muted);
-    font-size:14px;
-    margin-top:8px;
+  .meta{ color:var(--text-muted); font-size:14px; margin-top:8px; }
+  .pcs{ color:var(--green); font-weight:700; font-size:24px; margin-top:8px; }
+  .extra{ font-size:12px; color:var(--text-muted); margin-top:10px; display:flex; gap:16px; flex-wrap:wrap; }
+
+  /* ── Grid view ───────────────────────────────────── */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:14px;
   }
-  .pcs{
-    color:var(--green);
-    font-weight:700;
-    font-size:24px;
-    margin-top:8px;
+  .tile{
+    border:1px solid var(--border);
+    border-top:4px solid #ccc;
+    border-radius:8px;
+    padding:14px;
+    background:#fff;
   }
-  .extra{
-    font-size:12px;
-    color:var(--text-muted);
-    margin-top:10px;
-    display:flex;
-    gap:16px;
-    flex-wrap:wrap;
+  .tile .brand-badge{ font-size:14px; margin-bottom:8px; }
+  .tile .pcs{ font-size:20px; margin-top:6px; }
+  .tile .meta{ font-size:12px; margin-top:6px; }
+  .tile .extra{ font-size:11px; margin-top:8px; gap:10px; }
+
+  /* ── Table view ──────────────────────────────────── */
+  .table-scroll{ overflow-x:auto; }
+  table.data-table{ width:100%; border-collapse:collapse; font-size:13px; }
+  table.data-table th{
+    text-align:left; padding:9px 10px; background:#faf9f7;
+    border-bottom:2px solid var(--border);
+    white-space:nowrap; cursor:pointer; user-select:none;
+    color:var(--ink); font-size:12px; text-transform:uppercase; letter-spacing:.3px;
   }
-  .footer{
-    text-align:center;
-    margin-top:20px;
-    font-size:12px;
-    color:var(--text-muted);
-  }
-  .state{
-    text-align:center;
-    padding:40px 20px;
-    color:var(--text-muted);
-  }
-  .state.error{
-    color:#b91c1c;
-  }
+  table.data-table th:hover{ color:var(--accent); }
+  table.data-table th .arrow{ color:var(--accent); margin-left:4px; }
+  table.data-table td{ padding:9px 10px; border-bottom:1px solid var(--border); color:var(--text-dark); }
+  table.data-table tbody tr:hover{ background:#faf9f7; }
+  table.data-table .pcs-cell{ color:var(--green); font-weight:700; }
+
+  .state{ text-align:center; padding:40px 20px; color:var(--text-muted); }
+  .state.error{ color:#b91c1c; }
   .spinner{
-    width:28px;
-    height:28px;
-    margin:0 auto 14px;
-    border:3px solid var(--border);
-    border-top-color:var(--accent);
-    border-radius:50%;
-    animation:spin 0.8s linear infinite;
+    width:28px; height:28px; margin:0 auto 14px;
+    border:3px solid var(--border); border-top-color:var(--accent);
+    border-radius:50%; animation:spin 0.8s linear infinite;
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
-  .retry-btn{
-    margin-top:14px;
-    padding:8px 18px;
-    background:var(--accent);
-    color:#fff;
-    border:none;
-    border-radius:6px;
-    font-size:13px;
-    cursor:pointer;
+
+  .footer{ text-align:center; margin-top:20px; font-size:12px; color:var(--text-muted); }
+
+  @media (max-width:520px){
+    .card{ padding:16px; }
+    .title{ font-size:22px; }
   }
-  .retry-btn:hover{ opacity:0.9; }
 </style>
 </head>
 <body>
+<div class="wrap">
   <div class="card">
     <div class="header">
-      <h1 class="title" id="pageTitle">Lot Viewer</h1>
-      <div class="subtitle" id="pageSubtitle">Plywood Stockify · Century Plyboards (India) Ltd.</div>
-    </div>
-    <div id="content">
-      <div class="state">
-        <div class="spinner"></div>
-        Loading lot contents…
+      <div class="header-row">
+        <div>
+          <h1 class="title" id="pageTitle">Lot Viewer</h1>
+          <div class="subtitle" id="pageSubtitle">Plywood Stockify · Century Plyboards (India) Ltd.</div>
+        </div>
+        <button type="button" class="btn secondary" id="searchAnotherBtn">🔍 Search Another Lot Number</button>
       </div>
     </div>
+
+    <div class="toolbar" id="toolbar" style="display:none;">
+      <form class="row" id="searchForm">
+        <label class="mini">Lot No</label>
+        <input type="text" id="lotInput" class="lot-input" placeholder="e.g. 1234">
+        <label class="mini">Section</label>
+        <select id="sectionSelect">
+          <option value="">Main</option>
+          <option value="wip">WIP</option>
+        </select>
+        <button type="submit" class="btn">🔍 Search</button>
+        <button type="button" class="btn secondary" id="wipShortcutBtn">🔍 WIP MAT Section</button>
+      </form>
+
+      <div class="row">
+        <div class="view-tabs">
+          <button type="button" class="view-btn active" data-view="list">List</button>
+          <button type="button" class="view-btn" data-view="grid">Grid</button>
+          <button type="button" class="view-btn" data-view="table">Table</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="filter-group">
+          <label class="mini">Brand</label>
+          <select id="filterBrand"><option value="">All Brands</option></select>
+        </div>
+        <div class="filter-group">
+          <label class="mini">Thickness</label>
+          <select id="filterThickness"><option value="">All</option></select>
+        </div>
+        <div class="filter-group">
+          <label class="mini">Size</label>
+          <select id="filterSize"><option value="">All Sizes</option></select>
+        </div>
+        <div class="filter-group">
+          <label class="mini">Min Pcs</label>
+          <input type="number" id="filterPiecesMin" class="num-input" min="0">
+        </div>
+        <div class="filter-group">
+          <label class="mini">Min NA m²</label>
+          <input type="number" id="filterNaMin" class="num-input" min="0" step="0.01">
+        </div>
+        <div class="filter-group">
+          <label class="mini">Min SQM m²</label>
+          <input type="number" id="filterSqmMin" class="num-input" min="0" step="0.01">
+        </div>
+        <button type="button" class="btn ghost" id="clearFiltersBtn">Clear filters</button>
+      </div>
+
+      <div class="row">
+        <label class="mini">Sort by</label>
+        <select id="sortField">
+          <option value="BRAND">Brand</option>
+          <option value="THICKNESS">Thickness</option>
+          <option value="SIZE">Size</option>
+          <option value="PIECES">Pieces</option>
+          <option value="NA">NA (m²)</option>
+          <option value="SQM">SQM (m²)</option>
+        </select>
+        <button type="button" class="sort-dir" id="sortDirBtn" title="Toggle sort direction">▲</button>
+      </div>
+    </div>
+
+    <div class="results-count" id="resultsCount" style="display:none;"></div>
+    <div id="content">
+      <div class="state">Enter a lot number above, scan a lot QR code, or open the WIP MAT Section.</div>
+    </div>
   </div>
+</div>
 
 <script>
   // ── CONFIG ───────────────────────────────────────────────
@@ -138,60 +268,76 @@
   var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaKZDMZ-sx2h_TeOmmedndm__HmIj87K-XwEqc8x7CJBkgNxkGAPifGpVRv5DhNGVVcg/exec';
   // ─────────────────────────────────────────────────────────
 
-  var params  = new URLSearchParams(window.location.search);
-  var lotNo   = params.get('lot');
-  var section = params.get('section') || '';
+  var state = {
+    lotNo: '',
+    section: '',
+    allItems: [],
+    view: 'list',
+    sortField: 'BRAND',
+    sortDir: 'asc',
+    filters: { brand: '', thickness: '', size: '', piecesMin: '', naMin: '', sqmMin: '' }
+  };
 
-  var contentEl  = document.getElementById('content');
-  var titleEl    = document.getElementById('pageTitle');
-  var subtitleEl = document.getElementById('pageSubtitle');
+  var els = {
+    title:        document.getElementById('pageTitle'),
+    subtitle:     document.getElementById('pageSubtitle'),
+    toolbar:      document.getElementById('toolbar'),
+    content:      document.getElementById('content'),
+    resultsCount: document.getElementById('resultsCount'),
+    searchForm:   document.getElementById('searchForm'),
+    lotInput:     document.getElementById('lotInput'),
+    sectionSelect:document.getElementById('sectionSelect'),
+    wipBtn:       document.getElementById('wipShortcutBtn'),
+    searchAnotherBtn: document.getElementById('searchAnotherBtn'),
+    viewBtns:     document.querySelectorAll('.view-btn'),
+    filterBrand:  document.getElementById('filterBrand'),
+    filterThickness: document.getElementById('filterThickness'),
+    filterSize:   document.getElementById('filterSize'),
+    filterPiecesMin: document.getElementById('filterPiecesMin'),
+    filterNaMin:  document.getElementById('filterNaMin'),
+    filterSqmMin: document.getElementById('filterSqmMin'),
+    clearFiltersBtn: document.getElementById('clearFiltersBtn'),
+    sortFieldSel: document.getElementById('sortField'),
+    sortDirBtn:   document.getElementById('sortDirBtn')
+  };
 
-  function buildUrl(extra) {
+  // ── Networking ───────────────────────────────────────────
+  function buildUrl(lotNo, section, extra) {
     var u = APPS_SCRIPT_URL + '?lot=' + encodeURIComponent(lotNo);
     if (section) u += '&section=' + encodeURIComponent(section);
     if (extra) u += extra;
     return u;
   }
 
-  function loadViaFetch() {
-    return fetch(buildUrl(), { cache: 'no-store' }).then(function(res) {
+  function loadViaFetch(lotNo, section) {
+    return fetch(buildUrl(lotNo, section), { cache: 'no-store' }).then(function(res) {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return res.json();
     });
   }
 
-  // Fallback for when fetch is blocked (older Apps Script deployments,
-  // strict browser CORS policies, etc.) — uses a <script> tag instead
-  // of XHR/fetch, which is not subject to CORS.
-  function loadViaJsonp() {
+  function loadViaJsonp(lotNo, section) {
     return new Promise(function(resolve, reject) {
       var cbName = 'stockiflyCb_' + Date.now();
-      var timeout = setTimeout(function() {
-        cleanup();
-        reject(new Error('Request timed out'));
-      }, 10000);
-
+      var timeout = setTimeout(function() { cleanup(); reject(new Error('Request timed out')); }, 10000);
       function cleanup() {
         clearTimeout(timeout);
         delete window[cbName];
         if (script.parentNode) script.parentNode.removeChild(script);
       }
-
-      window[cbName] = function(data) {
-        cleanup();
-        resolve(data);
-      };
-
+      window[cbName] = function(data) { cleanup(); resolve(data); };
       var script = document.createElement('script');
-      script.src = buildUrl('&callback=' + cbName);
-      script.onerror = function() {
-        cleanup();
-        reject(new Error('Failed to reach Stockifly'));
-      };
+      script.src = buildUrl(lotNo, section, '&callback=' + cbName);
+      script.onerror = function() { cleanup(); reject(new Error('Failed to reach Stockifly')); };
       document.body.appendChild(script);
     });
   }
 
+  function fetchData(lotNo, section) {
+    return loadViaFetch(lotNo, section).catch(function() { return loadViaJsonp(lotNo, section); });
+  }
+
+  // ── Helpers ──────────────────────────────────────────────
   function isLightColor(color) {
     var hex = String(color || '#cccccc').replace('#', '');
     if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
@@ -205,31 +351,78 @@
     });
   }
 
-  function render(payload) {
-    titleEl.textContent = 'Lot ' + (payload.lotNo || lotNo) + ' Contents';
+  function uniqueValues(items, key) {
+    var seen = {}, out = [];
+    items.forEach(function(item) {
+      var v = item[key];
+      if (v === undefined || v === null || v === '') return;
+      var k = String(v);
+      if (!seen[k]) { seen[k] = true; out.push(v); }
+    });
+    return out.sort(function(a,b){ return String(a).localeCompare(String(b), undefined, {numeric:true}); });
+  }
 
-    if (!payload.ok) {
-      contentEl.innerHTML =
-        '<div class="state error">' +
-          'Could not load this lot.<br>' + escapeHtml(payload.error || 'Unknown error') +
-          '<br><button class="retry-btn" onclick="location.reload()">Retry</button>' +
-        '</div>';
-      return;
+  function fillSelect(selectEl, values, placeholder) {
+    var current = selectEl.value;
+    selectEl.innerHTML = '<option value="">' + placeholder + '</option>';
+    values.forEach(function(v) {
+      var opt = document.createElement('option');
+      opt.value = String(v);
+      opt.textContent = String(v);
+      selectEl.appendChild(opt);
+    });
+    if (values.indexOf(current) !== -1 || current === '') selectEl.value = current;
+  }
+
+  function fieldValue(item, field) {
+    switch (field) {
+      case 'BRAND':     return item.BRAND || '';
+      case 'THICKNESS': return Number(item.THICKNESS) || 0;
+      case 'SIZE':      return item.sizeText || String(item.SIZE || '');
+      case 'PIECES':    return Number(item.PIECES_REMAINING) || 0;
+      case 'NA':        return Number(item.NA_REMAINING) || 0;
+      case 'SQM':       return Number(item.SQM_REMAINING) || 0;
+      default:          return '';
     }
+  }
 
-    var items = payload.items || [];
-    if (items.length === 0) {
-      contentEl.innerHTML = '<div class="state">No active stock found for this lot.</div>';
-      return;
-    }
+  // ── Filtering & sorting ──────────────────────────────────
+  function getFiltered() {
+    var f = state.filters;
+    return state.allItems.filter(function(item) {
+      if (f.brand && item.BRAND !== f.brand) return false;
+      if (f.thickness && String(item.THICKNESS) !== f.thickness) return false;
+      if (f.size && (item.sizeText !== f.size && String(item.SIZE) !== f.size)) return false;
+      if (f.piecesMin !== '' && Number(item.PIECES_REMAINING) < Number(f.piecesMin)) return false;
+      if (f.naMin !== '' && Number(item.NA_REMAINING) < Number(f.naMin)) return false;
+      if (f.sqmMin !== '' && Number(item.SQM_REMAINING) < Number(f.sqmMin)) return false;
+      return true;
+    });
+  }
 
+  function getSorted(items) {
+    var field = state.sortField, dir = state.sortDir;
+    var copy = items.slice();
+    copy.sort(function(a, b) {
+      var av = fieldValue(a, field), bv = fieldValue(b, field);
+      if (typeof av === 'string') { av = av.toLowerCase(); bv = String(bv).toLowerCase(); }
+      if (av < bv) return dir === 'asc' ? -1 : 1;
+      if (av > bv) return dir === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return copy;
+  }
+
+  // ── Rendering ────────────────────────────────────────────
+  function renderList(items) {
+    if (items.length === 0) { els.content.innerHTML = '<div class="state">No stock matches the current filters.</div>'; return; }
     var html = '';
     items.forEach(function(item) {
       var color = item.color || '#ccc';
       var textColor = item.textColor || (isLightColor(color) ? '#000' : '#fff');
       html +=
         '<div class="item" style="border-left-color:' + color + '">' +
-          '<div class="brand" style="background:' + color + ';color:' + textColor + '">' + escapeHtml(item.BRAND) + '</div>' +
+          '<div class="brand-badge" style="background:' + color + ';color:' + textColor + '">' + escapeHtml(item.BRAND) + '</div>' +
           '<div class="meta">' + escapeHtml(item.THICKNESS) + 'mm · ' + escapeHtml(item.sizeText) + ' (' + escapeHtml(item.SIZE) + ')</div>' +
           '<div class="pcs">' + escapeHtml(item.PIECES_REMAINING) + ' pcs</div>' +
           '<div class="extra">' +
@@ -238,25 +431,207 @@
           '</div>' +
         '</div>';
     });
-    html += '<div class="footer">Plywood Stockify · Century Plyboards (India) Ltd. · Updated ' + escapeHtml(payload.generatedAt || '') + '</div>';
-    contentEl.innerHTML = html;
+    els.content.innerHTML = html;
+  }
+
+  function renderGrid(items) {
+    if (items.length === 0) { els.content.innerHTML = '<div class="state">No stock matches the current filters.</div>'; return; }
+    var html = '<div class="grid">';
+    items.forEach(function(item) {
+      var color = item.color || '#ccc';
+      var textColor = item.textColor || (isLightColor(color) ? '#000' : '#fff');
+      html +=
+        '<div class="tile" style="border-top-color:' + color + '">' +
+          '<div class="brand-badge" style="background:' + color + ';color:' + textColor + '">' + escapeHtml(item.BRAND) + '</div>' +
+          '<div class="meta">' + escapeHtml(item.THICKNESS) + 'mm · ' + escapeHtml(item.sizeText) + '</div>' +
+          '<div class="pcs">' + escapeHtml(item.PIECES_REMAINING) + ' pcs</div>' +
+          '<div class="extra">' +
+            '<span>NA ' + Number(item.NA_REMAINING || 0).toFixed(2) + '</span>' +
+            '<span>SQM ' + Number(item.SQM_REMAINING || 0).toFixed(2) + '</span>' +
+          '</div>' +
+        '</div>';
+    });
+    html += '</div>';
+    els.content.innerHTML = html;
+  }
+
+  function sortArrow(field) {
+    if (state.sortField !== field) return '';
+    return '<span class="arrow">' + (state.sortDir === 'asc' ? '▲' : '▼') + '</span>';
+  }
+
+  function renderTable(items) {
+    if (items.length === 0) { els.content.innerHTML = '<div class="state">No stock matches the current filters.</div>'; return; }
+    var cols = [
+      ['BRAND','Brand'], ['THICKNESS','Thickness'], ['SIZE','Size'],
+      ['PIECES','Pieces'], ['NA','NA (m²)'], ['SQM','SQM (m²)']
+    ];
+    var html = '<div class="table-scroll"><table class="data-table"><thead><tr>';
+    cols.forEach(function(c) {
+      html += '<th data-field="' + c[0] + '">' + c[1] + sortArrow(c[0]) + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+    items.forEach(function(item) {
+      var color = item.color || '#ccc';
+      var textColor = item.textColor || (isLightColor(color) ? '#000' : '#fff');
+      html +=
+        '<tr>' +
+          '<td><span class="brand-badge" style="background:' + color + ';color:' + textColor + ';font-size:12px;">' + escapeHtml(item.BRAND) + '</span></td>' +
+          '<td>' + escapeHtml(item.THICKNESS) + 'mm</td>' +
+          '<td>' + escapeHtml(item.sizeText) + ' (' + escapeHtml(item.SIZE) + ')</td>' +
+          '<td class="pcs-cell">' + escapeHtml(item.PIECES_REMAINING) + '</td>' +
+          '<td>' + Number(item.NA_REMAINING || 0).toFixed(4) + '</td>' +
+          '<td>' + Number(item.SQM_REMAINING || 0).toFixed(4) + '</td>' +
+        '</tr>';
+    });
+    html += '</tbody></table></div>';
+    els.content.innerHTML = html;
+
+    Array.prototype.forEach.call(els.content.querySelectorAll('th[data-field]'), function(th) {
+      th.addEventListener('click', function() {
+        var field = th.getAttribute('data-field');
+        if (state.sortField === field) { state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc'; }
+        else { state.sortField = field; state.sortDir = 'asc'; }
+        syncSortControls();
+        renderAll();
+      });
+    });
+  }
+
+  function renderAll() {
+    var items = getSorted(getFiltered());
+    els.resultsCount.style.display = '';
+    els.resultsCount.textContent = items.length + ' item' + (items.length === 1 ? '' : 's') +
+      ' · sorted by ' + els.sortFieldSel.options[els.sortFieldSel.selectedIndex].text +
+      ' ' + (state.sortDir === 'asc' ? 'ascending' : 'descending');
+    if (state.view === 'list') renderList(items);
+    else if (state.view === 'grid') renderGrid(items);
+    else renderTable(items);
+  }
+
+  function syncSortControls() {
+    els.sortFieldSel.value = state.sortField;
+    els.sortDirBtn.textContent = state.sortDir === 'asc' ? '▲' : '▼';
   }
 
   function renderFatalError(msg) {
-    contentEl.innerHTML = '<div class="state error">' + escapeHtml(msg) + '<br><button class="retry-btn" onclick="location.reload()">Retry</button></div>';
+    els.toolbar.style.display = 'none';
+    els.resultsCount.style.display = 'none';
+    els.content.innerHTML = '<div class="state error">' + escapeHtml(msg) + '<br><button class="btn secondary" style="margin-top:12px;" onclick="location.reload()">Retry</button></div>';
   }
 
-  if (!lotNo) {
-    titleEl.textContent = 'Lot Viewer';
-    renderFatalError('No lot number was given in the link. Scan a valid lot QR code.');
-  } else if (APPS_SCRIPT_URL.indexOf('YOUR_DEPLOYMENT_ID') !== -1) {
-    renderFatalError('This page is not configured yet — set APPS_SCRIPT_URL in the page source.');
-  } else {
-    loadViaFetch()
-      .catch(function() { return loadViaJsonp(); })
-      .then(render)
-      .catch(function(err) { renderFatalError('Could not reach Stockifly. ' + err.message); });
+  function showLoading() {
+    els.toolbar.style.display = 'none';
+    els.resultsCount.style.display = 'none';
+    els.content.innerHTML = '<div class="state"><div class="spinner"></div>Loading lot contents…</div>';
   }
+
+  function updateTitle() {
+    if (state.section === 'wip') {
+      els.title.textContent = 'WIP MAT Section';
+    } else {
+      els.title.textContent = 'Lot ' + state.lotNo + ' Contents';
+    }
+  }
+
+  function updateUrlBar() {
+    var u = new URL(window.location.href);
+    u.searchParams.set('lot', state.lotNo);
+    if (state.section) u.searchParams.set('section', state.section); else u.searchParams.delete('section');
+    window.history.replaceState({}, '', u.toString());
+  }
+
+  // ── Main load flow ───────────────────────────────────────
+  function loadLot(lotNo, section) {
+    if (!lotNo) return;
+    state.lotNo = String(lotNo).trim();
+    state.section = section === 'wip' ? 'wip' : '';
+    els.lotInput.value = state.lotNo;
+    els.sectionSelect.value = state.section;
+    updateUrlBar();
+    updateTitle();
+    showLoading();
+
+    fetchData(state.lotNo, state.section).then(function(payload) {
+      if (!payload.ok) { renderFatalError('Could not load this lot. ' + (payload.error || 'Unknown error')); return; }
+      state.allItems = payload.items || [];
+      // reset filters on a fresh lot load, keep the chosen view/sort
+      state.filters = { brand:'', thickness:'', size:'', piecesMin:'', naMin:'', sqmMin:'' };
+      els.filterPiecesMin.value = ''; els.filterNaMin.value = ''; els.filterSqmMin.value = '';
+      fillSelect(els.filterBrand, uniqueValues(state.allItems, 'BRAND'), 'All Brands');
+      fillSelect(els.filterThickness, uniqueValues(state.allItems, 'THICKNESS'), 'All Thickness');
+      fillSelect(els.filterSize, uniqueValues(state.allItems, 'sizeText'), 'All Sizes');
+      els.filterBrand.value = ''; els.filterThickness.value = ''; els.filterSize.value = '';
+      els.toolbar.style.display = '';
+      renderAll();
+    }).catch(function(err) {
+      renderFatalError('Could not reach Stockifly. ' + err.message);
+    });
+  }
+
+  // ── Wire up controls ─────────────────────────────────────
+  els.searchForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    loadLot(els.lotInput.value.trim(), els.sectionSelect.value);
+  });
+
+  els.wipBtn.addEventListener('click', function() {
+    loadLot('100', 'wip');
+  });
+
+  els.searchAnotherBtn.addEventListener('click', function() {
+    var val = window.prompt('Enter the lot number to search:', '');
+    if (val === null) return;
+    val = val.trim();
+    if (!val) return;
+    loadLot(val, state.section);
+  });
+
+  Array.prototype.forEach.call(els.viewBtns, function(btn) {
+    btn.addEventListener('click', function() {
+      Array.prototype.forEach.call(els.viewBtns, function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      state.view = btn.getAttribute('data-view');
+      renderAll();
+    });
+  });
+
+  els.filterBrand.addEventListener('change', function() { state.filters.brand = els.filterBrand.value; renderAll(); });
+  els.filterThickness.addEventListener('change', function() { state.filters.thickness = els.filterThickness.value; renderAll(); });
+  els.filterSize.addEventListener('change', function() { state.filters.size = els.filterSize.value; renderAll(); });
+  els.filterPiecesMin.addEventListener('input', function() { state.filters.piecesMin = els.filterPiecesMin.value; renderAll(); });
+  els.filterNaMin.addEventListener('input', function() { state.filters.naMin = els.filterNaMin.value; renderAll(); });
+  els.filterSqmMin.addEventListener('input', function() { state.filters.sqmMin = els.filterSqmMin.value; renderAll(); });
+
+  els.clearFiltersBtn.addEventListener('click', function() {
+    state.filters = { brand:'', thickness:'', size:'', piecesMin:'', naMin:'', sqmMin:'' };
+    els.filterBrand.value = ''; els.filterThickness.value = ''; els.filterSize.value = '';
+    els.filterPiecesMin.value = ''; els.filterNaMin.value = ''; els.filterSqmMin.value = '';
+    renderAll();
+  });
+
+  els.sortFieldSel.addEventListener('change', function() { state.sortField = els.sortFieldSel.value; renderAll(); });
+  els.sortDirBtn.addEventListener('click', function() {
+    state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+    syncSortControls();
+    renderAll();
+  });
+
+  // ── Init from URL ────────────────────────────────────────
+  (function init() {
+    var params = new URLSearchParams(window.location.search);
+    var lot = params.get('lot');
+    var section = params.get('section') || '';
+    if (APPS_SCRIPT_URL.indexOf('YOUR_DEPLOYMENT_ID') !== -1) {
+      renderFatalError('This page is not configured yet — set APPS_SCRIPT_URL in the page source.');
+      return;
+    }
+    if (lot) {
+      loadLot(lot, section);
+    } else {
+      els.sectionSelect.value = section === 'wip' ? 'wip' : '';
+    }
+  })();
 </script>
 </body>
 </html>
