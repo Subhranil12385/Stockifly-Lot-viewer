@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stockifly — Lot Viewer</title>
+<style>
+  :root{
+    --bg:#f8f7f4;
+    --card:#ffffff;
+    --border:#e8e4de;
+    --accent:#d97706;
+    --text-muted:#8a8480;
+    --text-dark:#374151;
+    --green:#059669;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--bg);
+    padding:12px;
+    margin:0;
+    -webkit-font-smoothing:antialiased;
+  }
+  .card{
+    background:var(--card);
+    border-radius:12px;
+    padding:24px;
+    max-width:800px;
+    margin:0 auto;
+    border:1px solid var(--border);
+  }
+  .header{
+    border-bottom:3px solid var(--accent);
+    padding-bottom:12px;
+    margin-bottom:20px;
+  }
+  .title{
+    font-size:28px;
+    font-weight:700;
+    margin:0;
+    color:#1c1917;
+  }
+  .subtitle{
+    font-size:12px;
+    color:var(--text-muted);
+    margin-top:4px;
+  }
+  .item{
+    border-left:5px solid #ccc;
+    padding:16px;
+    margin-bottom:16px;
+    background:#fff;
+    border-radius:0 8px 8px 0;
+    box-shadow:0 1px 2px rgba(0,0,0,0.03);
+  }
+  .brand{
+    font-weight:700;
+    font-size:18px;
+    margin-bottom:4px;
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:4px;
+  }
+  .meta{
+    color:var(--text-muted);
+    font-size:14px;
+    margin-top:8px;
+  }
+  .pcs{
+    color:var(--green);
+    font-weight:700;
+    font-size:24px;
+    margin-top:8px;
+  }
+  .extra{
+    font-size:12px;
+    color:var(--text-muted);
+    margin-top:10px;
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .footer{
+    text-align:center;
+    margin-top:20px;
+    font-size:12px;
+    color:var(--text-muted);
+  }
+  .state{
+    text-align:center;
+    padding:40px 20px;
+    color:var(--text-muted);
+  }
+  .state.error{
+    color:#b91c1c;
+  }
+  .spinner{
+    width:28px;
+    height:28px;
+    margin:0 auto 14px;
+    border:3px solid var(--border);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .retry-btn{
+    margin-top:14px;
+    padding:8px 18px;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .retry-btn:hover{ opacity:0.9; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h1 class="title" id="pageTitle">Lot Viewer</h1>
+      <div class="subtitle" id="pageSubtitle">Plywood Stockify · Century Plyboards (India) Ltd.</div>
+    </div>
+    <div id="content">
+      <div class="state">
+        <div class="spinner"></div>
+        Loading lot contents…
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ── CONFIG ───────────────────────────────────────────────
+  // Replace with your deployed Apps Script Web App URL (ends in /exec)
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaKZDMZ-sx2h_TeOmmedndm__HmIj87K-XwEqc8x7CJBkgNxkGAPifGpVRv5DhNGVVcg/exec';
+  // ─────────────────────────────────────────────────────────
+
+  var params  = new URLSearchParams(window.location.search);
+  var lotNo   = params.get('lot');
+  var section = params.get('section') || '';
+
+  var contentEl  = document.getElementById('content');
+  var titleEl    = document.getElementById('pageTitle');
+  var subtitleEl = document.getElementById('pageSubtitle');
+
+  function buildUrl(extra) {
+    var u = APPS_SCRIPT_URL + '?lot=' + encodeURIComponent(lotNo);
+    if (section) u += '&section=' + encodeURIComponent(section);
+    if (extra) u += extra;
+    return u;
+  }
+
+  function loadViaFetch() {
+    return fetch(buildUrl(), { cache: 'no-store' }).then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    });
+  }
+
+  // Fallback for when fetch is blocked (older Apps Script deployments,
+  // strict browser CORS policies, etc.) — uses a <script> tag instead
+  // of XHR/fetch, which is not subject to CORS.
+  function loadViaJsonp() {
+    return new Promise(function(resolve, reject) {
+      var cbName = 'stockiflyCb_' + Date.now();
+      var timeout = setTimeout(function() {
+        cleanup();
+        reject(new Error('Request timed out'));
+      }, 10000);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      window[cbName] = function(data) {
+        cleanup();
+        resolve(data);
+      };
+
+      var script = document.createElement('script');
+      script.src = buildUrl('&callback=' + cbName);
+      script.onerror = function() {
+        cleanup();
+        reject(new Error('Failed to reach Stockifly'));
+      };
+      document.body.appendChild(script);
+    });
+  }
+
+  function isLightColor(color) {
+    var hex = String(color || '#cccccc').replace('#', '');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    var r = parseInt(hex.substr(0,2),16), g = parseInt(hex.substr(2,2),16), b = parseInt(hex.substr(4,2),16);
+    return ((r*299 + g*587 + b*114) / 1000) > 155;
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function(c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  }
+
+  function render(payload) {
+    titleEl.textContent = 'Lot ' + (payload.lotNo || lotNo) + ' Contents';
+
+    if (!payload.ok) {
+      contentEl.innerHTML =
+        '<div class="state error">' +
+          'Could not load this lot.<br>' + escapeHtml(payload.error || 'Unknown error') +
+          '<br><button class="retry-btn" onclick="location.reload()">Retry</button>' +
+        '</div>';
+      return;
+    }
+
+    var items = payload.items || [];
+    if (items.length === 0) {
+      contentEl.innerHTML = '<div class="state">No active stock found for this lot.</div>';
+      return;
+    }
+
+    var html = '';
+    items.forEach(function(item) {
+      var color = item.color || '#ccc';
+      var textColor = item.textColor || (isLightColor(color) ? '#000' : '#fff');
+      html +=
+        '<div class="item" style="border-left-color:' + color + '">' +
+          '<div class="brand" style="background:' + color + ';color:' + textColor + '">' + escapeHtml(item.BRAND) + '</div>' +
+          '<div class="meta">' + escapeHtml(item.THICKNESS) + 'mm · ' + escapeHtml(item.sizeText) + ' (' + escapeHtml(item.SIZE) + ')</div>' +
+          '<div class="pcs">' + escapeHtml(item.PIECES_REMAINING) + ' pcs</div>' +
+          '<div class="extra">' +
+            '<span>📏 NA: ' + Number(item.NA_REMAINING || 0).toFixed(4) + ' m²</span>' +
+            '<span>📐 SQM: ' + Number(item.SQM_REMAINING || 0).toFixed(4) + ' m²</span>' +
+          '</div>' +
+        '</div>';
+    });
+    html += '<div class="footer">Plywood Stockify · Century Plyboards (India) Ltd. · Updated ' + escapeHtml(payload.generatedAt || '') + '</div>';
+    contentEl.innerHTML = html;
+  }
+
+  function renderFatalError(msg) {
+    contentEl.innerHTML = '<div class="state error">' + escapeHtml(msg) + '<br><button class="retry-btn" onclick="location.reload()">Retry</button></div>';
+  }
+
+  if (!lotNo) {
+    titleEl.textContent = 'Lot Viewer';
+    renderFatalError('No lot number was given in the link. Scan a valid lot QR code.');
+  } else if (APPS_SCRIPT_URL.indexOf('YOUR_DEPLOYMENT_ID') !== -1) {
+    renderFatalError('This page is not configured yet — set APPS_SCRIPT_URL in the page source.');
+  } else {
+    loadViaFetch()
+      .catch(function() { return loadViaJsonp(); })
+      .then(render)
+      .catch(function(err) { renderFatalError('Could not reach Stockifly. ' + err.message); });
+  }
+</script>
+</body>
+</html>
