@@ -193,18 +193,6 @@
     </div>
 
     <div class="toolbar" id="toolbar" style="display:none;">
-      <form class="row" id="searchForm">
-        <label class="mini">Lot No</label>
-        <input type="text" id="lotInput" class="lot-input" placeholder="e.g. 1234">
-        <label class="mini">Section</label>
-        <select id="sectionSelect">
-          <option value="">Main</option>
-          <option value="wip">WIP</option>
-        </select>
-        <button type="submit" class="btn">🔍 Search</button>
-        <button type="button" class="btn secondary" id="wipShortcutBtn">🔍 WIP MAT Section</button>
-      </form>
-
       <div class="row">
         <div class="view-tabs">
           <button type="button" class="view-btn active" data-view="list">List</button>
@@ -284,10 +272,6 @@
     toolbar:      document.getElementById('toolbar'),
     content:      document.getElementById('content'),
     resultsCount: document.getElementById('resultsCount'),
-    searchForm:   document.getElementById('searchForm'),
-    lotInput:     document.getElementById('lotInput'),
-    sectionSelect:document.getElementById('sectionSelect'),
-    wipBtn:       document.getElementById('wipShortcutBtn'),
     searchAnotherBtn: document.getElementById('searchAnotherBtn'),
     viewBtns:     document.querySelectorAll('.view-btn'),
     filterBrand:  document.getElementById('filterBrand'),
@@ -542,12 +526,10 @@
   }
 
   // ── Main load flow ───────────────────────────────────────
-  function loadLot(lotNo, section) {
+  function loadLot(lotNo) {
     if (!lotNo) return;
     state.lotNo = String(lotNo).trim();
-    state.section = section === 'wip' ? 'wip' : '';
-    els.lotInput.value = state.lotNo;
-    els.sectionSelect.value = state.section;
+    state.section = state.lotNo === '100' ? 'wip' : '';
     updateUrlBar();
     updateTitle();
     showLoading();
@@ -570,21 +552,12 @@
   }
 
   // ── Wire up controls ─────────────────────────────────────
-  els.searchForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    loadLot(els.lotInput.value.trim(), els.sectionSelect.value);
-  });
-
-  els.wipBtn.addEventListener('click', function() {
-    loadLot('100', 'wip');
-  });
-
   els.searchAnotherBtn.addEventListener('click', function() {
     var val = window.prompt('Enter the lot number to search:', '');
     if (val === null) return;
     val = val.trim();
     if (!val) return;
-    loadLot(val, state.section);
+    loadLot(val);
   });
 
   Array.prototype.forEach.call(els.viewBtns, function(btn) {
@@ -621,15 +594,12 @@
   (function init() {
     var params = new URLSearchParams(window.location.search);
     var lot = params.get('lot');
-    var section = params.get('section') || '';
     if (APPS_SCRIPT_URL.indexOf('YOUR_DEPLOYMENT_ID') !== -1) {
       renderFatalError('This page is not configured yet — set APPS_SCRIPT_URL in the page source.');
       return;
     }
     if (lot) {
-      loadLot(lot, section);
-    } else {
-      els.sectionSelect.value = section === 'wip' ? 'wip' : '';
+      loadLot(lot);
     }
   })();
 </script>
