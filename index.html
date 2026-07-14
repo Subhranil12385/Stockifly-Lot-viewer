@@ -62,6 +62,39 @@
   label.mini{ font-size:11px; color:var(--text-muted); margin-right:2px; white-space:nowrap; }
   .filter-group{ display:flex; align-items:center; gap:4px; }
 
+  /* ── Multi-select dropdown filters ───────────────── */
+  .ms-wrap{ position:relative; }
+  .ms-btn{
+    font-family:inherit; font-size:13px; padding:7px 10px; border:1px solid var(--border);
+    border-radius:6px; background:#fff; color:var(--text-dark); cursor:pointer; min-width:100px;
+    max-width:170px; text-align:left; display:inline-flex; align-items:center; justify-content:space-between; gap:6px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .ms-btn:hover{ border-color:var(--accent); }
+  .ms-btn.has-selection{ border-color:var(--accent); color:var(--accent-dark); font-weight:700; }
+  .ms-btn .caret{ font-size:9px; color:var(--text-muted); margin-left:4px; }
+  .ms-panel{
+    position:absolute; top:calc(100% + 4px); left:0; z-index:20;
+    background:#fff; border:1px solid var(--border); border-radius:8px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.12); padding:8px; min-width:170px; max-height:240px; overflow-y:auto;
+  }
+  .ms-panel-actions{ display:flex; gap:10px; margin-bottom:6px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+  .ms-mini-link{ background:none; border:none; color:var(--accent); font-size:11px; font-weight:700; padding:2px 4px; }
+  .ms-mini-link:hover{ text-decoration:underline; }
+  .ms-option{ display:flex; align-items:center; gap:7px; padding:5px 4px; font-size:13px; color:var(--text-dark); border-radius:4px; cursor:pointer; white-space:nowrap; }
+  .ms-option:hover{ background:#faf9f7; }
+  .ms-option input[type=checkbox]{ margin:0; cursor:pointer; accent-color:var(--accent); }
+
+  /* ── Totals summary bar ──────────────────────────── */
+  .summary-bar{
+    display:flex; flex-wrap:wrap; gap:8px 24px; align-items:center;
+    padding:10px 16px; margin-bottom:14px; background:#fdf6ec;
+    border:1px solid var(--accent); border-radius:8px;
+  }
+  .summary-bar .summary-item{ font-size:13px; color:var(--text-dark); }
+  .summary-bar .summary-item b{ color:var(--accent-dark); font-size:15px; }
+  .summary-bar .summary-label{ font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.3px; margin-right:5px; }
+
   button{ font-family:inherit; cursor:pointer; }
   .btn{
     padding:7px 16px;
@@ -188,7 +221,10 @@
           <h1 class="title" id="pageTitle">Lot Viewer</h1>
           <div class="subtitle" id="pageSubtitle">Stockifly — Lot Viewer · Century Plyboards (India) Ltd.</div>
         </div>
-        <button type="button" class="btn secondary" id="searchAnotherBtn">🔍 Search Another Lot Number</button>
+        <div style="text-align:right;">
+          <button type="button" class="btn secondary" id="searchAnotherBtn">🔍 Search Another Lot Number</button>
+          <div style="font-size:11px; color:#c9c4be; margin-top:5px;">To see WIP MAT, type '100' and search</div>
+        </div>
       </div>
     </div>
 
@@ -202,17 +238,38 @@
       </div>
 
       <div class="row">
-        <div class="filter-group">
+        <div class="filter-group ms-wrap" data-key="brand">
           <label class="mini">Brand</label>
-          <select id="filterBrand"><option value="">All Brands</option></select>
+          <button type="button" class="ms-btn" id="msBtnBrand">All Brands<span class="caret">▾</span></button>
+          <div class="ms-panel" id="msPanelBrand" hidden>
+            <div class="ms-panel-actions">
+              <button type="button" class="ms-mini-link" data-action="all">All</button>
+              <button type="button" class="ms-mini-link" data-action="none">None</button>
+            </div>
+            <div class="ms-options" id="msOptionsBrand"></div>
+          </div>
         </div>
-        <div class="filter-group">
+        <div class="filter-group ms-wrap" data-key="thickness">
           <label class="mini">Thickness</label>
-          <select id="filterThickness"><option value="">All</option></select>
+          <button type="button" class="ms-btn" id="msBtnThickness">All Thickness<span class="caret">▾</span></button>
+          <div class="ms-panel" id="msPanelThickness" hidden>
+            <div class="ms-panel-actions">
+              <button type="button" class="ms-mini-link" data-action="all">All</button>
+              <button type="button" class="ms-mini-link" data-action="none">None</button>
+            </div>
+            <div class="ms-options" id="msOptionsThickness"></div>
+          </div>
         </div>
-        <div class="filter-group">
+        <div class="filter-group ms-wrap" data-key="size">
           <label class="mini">Size</label>
-          <select id="filterSize"><option value="">All Sizes</option></select>
+          <button type="button" class="ms-btn" id="msBtnSize">All Sizes<span class="caret">▾</span></button>
+          <div class="ms-panel" id="msPanelSize" hidden>
+            <div class="ms-panel-actions">
+              <button type="button" class="ms-mini-link" data-action="all">All</button>
+              <button type="button" class="ms-mini-link" data-action="none">None</button>
+            </div>
+            <div class="ms-options" id="msOptionsSize"></div>
+          </div>
         </div>
         <div class="filter-group">
           <label class="mini">Min Pcs</label>
@@ -244,7 +301,8 @@
     </div>
 
     <div class="results-count" id="resultsCount" style="display:none;"></div>
-    <div id="content">
+    <div class="summary-bar" id="summaryBar" style="display:none;"></div>
+    <div id="content"
       <div class="state">Enter a lot number above, scan a lot QR code, or open the WIP MAT Section.</div>
     </div>
   </div>
@@ -263,7 +321,7 @@
     view: 'list',
     sortField: 'BRAND',
     sortDir: 'asc',
-    filters: { brand: '', thickness: '', size: '', piecesMin: '', naMin: '', sqmMin: '' }
+    filters: { brand: [], thickness: [], size: [], piecesMin: '', naMin: '', sqmMin: '' }
   };
 
   var els = {
@@ -272,11 +330,12 @@
     toolbar:      document.getElementById('toolbar'),
     content:      document.getElementById('content'),
     resultsCount: document.getElementById('resultsCount'),
+    summaryBar:   document.getElementById('summaryBar'),
     searchAnotherBtn: document.getElementById('searchAnotherBtn'),
     viewBtns:     document.querySelectorAll('.view-btn'),
-    filterBrand:  document.getElementById('filterBrand'),
-    filterThickness: document.getElementById('filterThickness'),
-    filterSize:   document.getElementById('filterSize'),
+    msBtnBrand: document.getElementById('msBtnBrand'), msPanelBrand: document.getElementById('msPanelBrand'), msOptionsBrand: document.getElementById('msOptionsBrand'),
+    msBtnThickness: document.getElementById('msBtnThickness'), msPanelThickness: document.getElementById('msPanelThickness'), msOptionsThickness: document.getElementById('msOptionsThickness'),
+    msBtnSize: document.getElementById('msBtnSize'), msPanelSize: document.getElementById('msPanelSize'), msOptionsSize: document.getElementById('msOptionsSize'),
     filterPiecesMin: document.getElementById('filterPiecesMin'),
     filterNaMin:  document.getElementById('filterNaMin'),
     filterSqmMin: document.getElementById('filterSqmMin'),
@@ -346,17 +405,76 @@
     return out.sort(function(a,b){ return String(a).localeCompare(String(b), undefined, {numeric:true}); });
   }
 
-  function fillSelect(selectEl, values, placeholder) {
-    var current = selectEl.value;
-    selectEl.innerHTML = '<option value="">' + placeholder + '</option>';
-    values.forEach(function(v) {
-      var opt = document.createElement('option');
-      opt.value = String(v);
-      opt.textContent = String(v);
-      selectEl.appendChild(opt);
-    });
-    if (values.indexOf(current) !== -1 || current === '') selectEl.value = current;
+  // ── Multi-select dropdown filters (Brand / Thickness / Size) ─
+  var multiSelectConfigs = [
+    { key:'brand',     btn: els.msBtnBrand,     panel: els.msPanelBrand,     options: els.msOptionsBrand,     placeholder:'All Brands',    suffix:'' },
+    { key:'thickness', btn: els.msBtnThickness, panel: els.msPanelThickness, options: els.msOptionsThickness, placeholder:'All Thickness', suffix:'mm' },
+    { key:'size',      btn: els.msBtnSize,      panel: els.msPanelSize,      options: els.msOptionsSize,      placeholder:'All Sizes',     suffix:'' }
+  ];
+
+  function updateMsButtonLabel(cfg) {
+    var sel = state.filters[cfg.key];
+    if (sel.length === 0) { cfg.btn.firstChild.textContent = cfg.placeholder; cfg.btn.classList.remove('has-selection'); }
+    else if (sel.length === 1) { cfg.btn.firstChild.textContent = sel[0] + cfg.suffix; cfg.btn.classList.add('has-selection'); }
+    else { cfg.btn.firstChild.textContent = sel.length + ' selected'; cfg.btn.classList.add('has-selection'); }
   }
+
+  function populateMultiSelect(cfg, values) {
+    // keep only selections that still exist among the new values
+    var valuesStr = values.map(String);
+    state.filters[cfg.key] = state.filters[cfg.key].filter(function(v) { return valuesStr.indexOf(v) !== -1; });
+    cfg.options.innerHTML = '';
+    values.forEach(function(v) {
+      var strV = String(v);
+      var label = document.createElement('label');
+      label.className = 'ms-option';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = strV;
+      cb.checked = state.filters[cfg.key].indexOf(strV) !== -1;
+      cb.addEventListener('change', function() {
+        var arr = state.filters[cfg.key];
+        var idx = arr.indexOf(cb.value);
+        if (cb.checked) { if (idx === -1) arr.push(cb.value); }
+        else if (idx !== -1) { arr.splice(idx, 1); }
+        updateMsButtonLabel(cfg);
+        renderAll();
+      });
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(strV + cfg.suffix));
+      cfg.options.appendChild(label);
+    });
+    updateMsButtonLabel(cfg);
+  }
+
+  function closeAllMsPanels() {
+    multiSelectConfigs.forEach(function(cfg) { cfg.panel.hidden = true; });
+  }
+
+  multiSelectConfigs.forEach(function(cfg) {
+    cfg.btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var willOpen = cfg.panel.hidden;
+      closeAllMsPanels();
+      cfg.panel.hidden = !willOpen;
+    });
+    cfg.panel.addEventListener('click', function(e) { e.stopPropagation(); });
+    cfg.panel.querySelector('[data-action="all"]').addEventListener('click', function() {
+      var arr = [];
+      Array.prototype.forEach.call(cfg.options.querySelectorAll('input[type=checkbox]'), function(cb) { cb.checked = true; arr.push(cb.value); });
+      state.filters[cfg.key] = arr;
+      updateMsButtonLabel(cfg);
+      renderAll();
+    });
+    cfg.panel.querySelector('[data-action="none"]').addEventListener('click', function() {
+      Array.prototype.forEach.call(cfg.options.querySelectorAll('input[type=checkbox]'), function(cb) { cb.checked = false; });
+      state.filters[cfg.key] = [];
+      updateMsButtonLabel(cfg);
+      renderAll();
+    });
+  });
+
+  document.addEventListener('click', function() { closeAllMsPanels(); });
 
   function fieldValue(item, field) {
     switch (field) {
@@ -374,9 +492,9 @@
   function getFiltered() {
     var f = state.filters;
     return state.allItems.filter(function(item) {
-      if (f.brand && item.BRAND !== f.brand) return false;
-      if (f.thickness && String(item.THICKNESS) !== f.thickness) return false;
-      if (f.size && (item.sizeText !== f.size && String(item.SIZE) !== f.size)) return false;
+      if (f.brand.length && f.brand.indexOf(String(item.BRAND)) === -1) return false;
+      if (f.thickness.length && f.thickness.indexOf(String(item.THICKNESS)) === -1) return false;
+      if (f.size.length && f.size.indexOf(String(item.sizeText)) === -1 && f.size.indexOf(String(item.SIZE)) === -1) return false;
       if (f.piecesMin !== '' && Number(item.PIECES_REMAINING) < Number(f.piecesMin)) return false;
       if (f.naMin !== '' && Number(item.NA_REMAINING) < Number(f.naMin)) return false;
       if (f.sqmMin !== '' && Number(item.SQM_REMAINING) < Number(f.sqmMin)) return false;
@@ -482,12 +600,27 @@
     });
   }
 
+  function renderSummary(items) {
+    var totalPieces = 0, totalNa = 0, totalSqm = 0;
+    items.forEach(function(item) {
+      totalPieces += Number(item.PIECES_REMAINING) || 0;
+      totalNa += Number(item.NA_REMAINING) || 0;
+      totalSqm += Number(item.SQM_REMAINING) || 0;
+    });
+    els.summaryBar.style.display = '';
+    els.summaryBar.innerHTML =
+      '<span class="summary-item"><span class="summary-label">Total Pcs</span><b>' + totalPieces.toLocaleString() + '</b></span>' +
+      '<span class="summary-item"><span class="summary-label">Total NA</span><b>' + totalNa.toFixed(4) + ' m²</b></span>' +
+      '<span class="summary-item"><span class="summary-label">Total SQM</span><b>' + totalSqm.toFixed(4) + ' m²</b></span>';
+  }
+
   function renderAll() {
     var items = getSorted(getFiltered());
     els.resultsCount.style.display = '';
     els.resultsCount.textContent = items.length + ' item' + (items.length === 1 ? '' : 's') +
       ' · sorted by ' + els.sortFieldSel.options[els.sortFieldSel.selectedIndex].text +
       ' ' + (state.sortDir === 'asc' ? 'ascending' : 'descending');
+    renderSummary(items);
     if (state.view === 'list') renderList(items);
     else if (state.view === 'grid') renderGrid(items);
     else renderTable(items);
@@ -501,12 +634,14 @@
   function renderFatalError(msg) {
     els.toolbar.style.display = 'none';
     els.resultsCount.style.display = 'none';
+    els.summaryBar.style.display = 'none';
     els.content.innerHTML = '<div class="state error">' + escapeHtml(msg) + '<br><button class="btn secondary" style="margin-top:12px;" onclick="location.reload()">Retry</button></div>';
   }
 
   function showLoading() {
     els.toolbar.style.display = 'none';
     els.resultsCount.style.display = 'none';
+    els.summaryBar.style.display = 'none';
     els.content.innerHTML = '<div class="state"><div class="spinner"></div>Loading lot contents…</div>';
   }
 
@@ -538,12 +673,11 @@
       if (!payload.ok) { renderFatalError('Could not load this lot. ' + (payload.error || 'Unknown error')); return; }
       state.allItems = payload.items || [];
       // reset filters on a fresh lot load, keep the chosen view/sort
-      state.filters = { brand:'', thickness:'', size:'', piecesMin:'', naMin:'', sqmMin:'' };
+      state.filters = { brand:[], thickness:[], size:[], piecesMin:'', naMin:'', sqmMin:'' };
       els.filterPiecesMin.value = ''; els.filterNaMin.value = ''; els.filterSqmMin.value = '';
-      fillSelect(els.filterBrand, uniqueValues(state.allItems, 'BRAND'), 'All Brands');
-      fillSelect(els.filterThickness, uniqueValues(state.allItems, 'THICKNESS'), 'All Thickness');
-      fillSelect(els.filterSize, uniqueValues(state.allItems, 'sizeText'), 'All Sizes');
-      els.filterBrand.value = ''; els.filterThickness.value = ''; els.filterSize.value = '';
+      populateMultiSelect(multiSelectConfigs[0], uniqueValues(state.allItems, 'BRAND'));
+      populateMultiSelect(multiSelectConfigs[1], uniqueValues(state.allItems, 'THICKNESS'));
+      populateMultiSelect(multiSelectConfigs[2], uniqueValues(state.allItems, 'sizeText'));
       els.toolbar.style.display = '';
       renderAll();
     }).catch(function(err) {
@@ -569,17 +703,17 @@
     });
   });
 
-  els.filterBrand.addEventListener('change', function() { state.filters.brand = els.filterBrand.value; renderAll(); });
-  els.filterThickness.addEventListener('change', function() { state.filters.thickness = els.filterThickness.value; renderAll(); });
-  els.filterSize.addEventListener('change', function() { state.filters.size = els.filterSize.value; renderAll(); });
   els.filterPiecesMin.addEventListener('input', function() { state.filters.piecesMin = els.filterPiecesMin.value; renderAll(); });
   els.filterNaMin.addEventListener('input', function() { state.filters.naMin = els.filterNaMin.value; renderAll(); });
   els.filterSqmMin.addEventListener('input', function() { state.filters.sqmMin = els.filterSqmMin.value; renderAll(); });
 
   els.clearFiltersBtn.addEventListener('click', function() {
-    state.filters = { brand:'', thickness:'', size:'', piecesMin:'', naMin:'', sqmMin:'' };
-    els.filterBrand.value = ''; els.filterThickness.value = ''; els.filterSize.value = '';
+    state.filters = { brand:[], thickness:[], size:[], piecesMin:'', naMin:'', sqmMin:'' };
     els.filterPiecesMin.value = ''; els.filterNaMin.value = ''; els.filterSqmMin.value = '';
+    multiSelectConfigs.forEach(function(cfg) {
+      Array.prototype.forEach.call(cfg.options.querySelectorAll('input[type=checkbox]'), function(cb) { cb.checked = false; });
+      updateMsButtonLabel(cfg);
+    });
     renderAll();
   });
 
